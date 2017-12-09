@@ -43,7 +43,7 @@ namespace Lab16.Controllers
             rptviewer.LocalReport.ReportPath = Request.MapPath(Request.ApplicationPath) +
                 @"Reporte.rdlc";
 
-            ReportDataSource rptdatasource = new ReportDataSource("dsPersona", Listado);
+            ReportDataSource rptdatasource = new ReportDataSource("dsPersona", listado);
             rptviewer.LocalReport.DataSources.Add(rptdatasource);
             rptviewer.SizeToReportContent = true;
 
@@ -55,7 +55,81 @@ namespace Lab16.Controllers
         public ActionResult Reporte(string FirstName)
         {
             List<Person> listado = new List<Person>();
+            listado = (from p in Contexto.Person
+                       where p.FirstName.Contains(FirstName)
+                       select p).ToList();
 
+            var rptviewer = new ReportViewer();
+            rptviewer.ProcessingMode = ProcessingMode.Local;
+            rptviewer.LocalReport.ReportPath = Request.MapPath(Request.ApplicationPath) +
+                 @"Reporte.rdlc";
+            ReportDataSource rptdatasource = new ReportDataSource("dsPersona", listado);
+            rptviewer.LocalReport.DataSources.Add(rptdatasource);
+            rptviewer.SizeToReportContent = true;
+
+            ViewBag.ReportViewer = rptviewer;
+            return View();
+
+        }
+
+        public ActionResult Graficos()
+        {
+            return View();
+        }
+        public ActionResult GraficoColumnas()
+        {
+            ArrayList x = new ArrayList();
+            ArrayList y = new ArrayList();
+            var query = (from c in Contexto.Course select c);
+            query.ToList().ForEach(r => x.Add(r.Title));
+            query.ToList().ForEach(r => y.Add(r.Credits));
+            new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+                .AddTitle("Columnas")
+                .AddSeries("Default", chartType: "Colum", xValue: x, yValues: y)
+                .Write("bmp");
+            return null;
+        }
+
+        public ActionResult GraficoBarras()
+        {
+            ArrayList x = new ArrayList();
+            ArrayList y = new ArrayList();
+            var query = (from c in Contexto.Course select c);
+            query.ToList().ForEach(r => x.Add(r.Title));
+            query.ToList().ForEach(r => y.Add(r.Credits));
+            new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+                .AddTitle("Grafico de barras")
+                .AddSeries("Default", chartType: "Bar", xValue: x, yValues: y)
+                .Write("bmp");
+            return null;
+        }
+
+        public ActionResult GraficoTarta()
+        {
+            ArrayList x = new ArrayList();
+            ArrayList y = new ArrayList();
+            var query = (from c in Contexto.Course select c);
+            query.ToList().ForEach(r => x.Add(r.Title));
+            query.ToList().ForEach(r => y.Add(r.Credits));
+            new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+                .AddTitle("IE")
+                .AddSeries("Default", chartType: "Pie", xValue: x, yValues: y)
+                .Write("bmp");
+            return null;
+        }
+
+        public ActionResult GraficoRadar()
+        {
+            ArrayList x = new ArrayList();
+            ArrayList y = new ArrayList();
+            var query = (from c in Contexto.Course select c);
+            query.ToList().ForEach(r => x.Add(r.Title));
+            query.ToList().ForEach(r => y.Add(r.Credits));
+            new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+                .AddTitle("Radar")
+                .AddSeries("Default", chartType: "Radar", xValue: x, yValues: y)
+                .Write("bmp");
+            return null;
         }
     }
 }
